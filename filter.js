@@ -28,6 +28,9 @@ filter = function() {
 	}
 
 	this.makeSinc = function() {
+		this.filterCutOff = document.getElementById("filtAmt").value;
+		this.sincSize = document.getElementById("sincSize").value;
+
 		this.sinc.length = 0;
 		for (var s = 0; s < this.sincSize; s++) {
 			var denom = this.filterCutOff * Math.PI * (s - (this.sincSize / 2));
@@ -37,21 +40,32 @@ filter = function() {
 	}
 	
 	this.calcFilter = function() {
+		
+		var filterType = document.getElementById("filtType").value;
 		this.filtered.length = 0;
-		// Navigate all samples except those at beginning and end outside sinc window
-		for (var s = 0; s < this.samples.length; s++) {
-			if (s < this.sincSize / 2 || s > this.samples.length - (this.sincSize / 2)) {
-				this.filtered.push(0);
-			} else {
-				var norm = 0;
-				var mac = 0;
-				for (var f = 0; f < this.sincSize;  f++) {
-					norm += this.sinc[f];
-					mac += this.sinc[f] * this.samples[s - (this.sincSize / 2) + f];
+		
+		switch (filterType) {
+		case sinc:
+		
+		
+			this.filtered.length = 0;
+			// Navigate all samples except those at beginning and end outside sinc window
+			for (var s = 0; s < this.samples.length; s++) {
+				if (s < this.sincSize / 2 || s > this.samples.length - (this.sincSize / 2)) {
+					this.filtered.push(0);
+				} else {
+					var norm = 0;
+					var mac = 0;
+					for (var f = 0; f < this.sincSize;  f++) {
+						norm += this.sinc[f];
+						mac += this.sinc[f] * this.samples[s - (this.sincSize / 2) + f];
+					}
+					this.filtered.push(mac / norm);
 				}
-				this.filtered.push(mac / norm);
 			}
-		}
+			break;
+		case movAv:
+			break;
 	}
 	
 	this.drawWaves = function() {
@@ -88,7 +102,6 @@ function toRadians(angle) {
 function toDegrees(angle) {
 	return posAng(angle * (180 / Math.PI));
 }
-var filter = new filter();
 
 function Redraw() {
 	filter.squareWave();
@@ -96,3 +109,6 @@ function Redraw() {
 	filter.calcFilter();
 	filter.drawWaves();
 }
+
+var filter = new filter();
+Redraw();
