@@ -19,7 +19,14 @@ filter = function() {
 	this.samples = [];
 	this.sinc = [];
 	this.filtered = [];
-	
+
+	this.redraw = function() {
+		filter.squareWave();
+		filter.makeSinc();
+		filter.calcFilter();
+		filter.drawWaves();
+	}
+
 	this.squareWave = function() {
 		this.samples.length = 0;
 		for (var s = 0; s < 400; s++) {
@@ -38,15 +45,16 @@ filter = function() {
 			this.sinc.push(denom == 0 ? 1 : Math.sin(denom) / denom); 
 		}
 	}
-	
+
+
 	this.calcFilter = function() {
 		
-		var filterType = document.getElementById("filtType").value;
+		var filterType = document.querySelector('input[name="filtType"]:checked').value;
+		
 		this.filtered.length = 0;
 		
 		switch (filterType) {
-		case sinc:
-		
+		case "sinc":
 		
 			this.filtered.length = 0;
 			// Navigate all samples except those at beginning and end outside sinc window
@@ -64,8 +72,21 @@ filter = function() {
 				}
 			}
 			break;
-		case movAv:
+			
+		case "movAv":
+			for (var s = 0; s < this.samples.length; s++) {
+				if (s < this.sincSize / 2 || s > this.samples.length - (this.sincSize / 2)) {
+					this.filtered.push(0);
+				} else {
+					var sum = 0;
+					for (var f = 0; f < this.sincSize;  f++) {
+						sum += this.samples[s - (this.sincSize / 2) + f];
+					}
+					this.filtered.push(sum / this.sincSize);
+				}
+			}
 			break;
+		}
 	}
 	
 	this.drawWaves = function() {
@@ -94,21 +115,31 @@ filter = function() {
 
 	}
 
+	this.drawSinc = function() {
+		viewport.clear();
+		context = viewport.ctx;
+		this.makeSinc();
+
+		var vertOffset = 250;
+
+		// Draw zero line
+		context.beginPath(); 
+		context.moveTo(0, vertOffset);
+		context.lineTo(this.sincSize * 4, vertOffset);
+		context.strokeStyle = "grey";
+		context.stroke();			
+
+		
+		for (var f = 0; f < this.sincSize;  f++) {
+			context.beginPath(); 
+			context.moveTo(f * 4, vertOffset - (this.sinc[f] * 200));
+			context.lineTo((f + 1) * 4, vertOffset - (this.sinc[f + 1] * 200));
+			context.strokeStyle = "green";
+			context.stroke();			
+		}
+	}
 }
 
-function toRadians(angle) {
-	return angle * (Math.PI / 180);
-}
-function toDegrees(angle) {
-	return posAng(angle * (180 / Math.PI));
-}
-
-function Redraw() {
-	filter.squareWave();
-	filter.makeSinc();
-	filter.calcFilter();
-	filter.drawWaves();
-}
 
 var filter = new filter();
-Redraw();
+filter.redraw();

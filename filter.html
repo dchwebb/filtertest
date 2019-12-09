@@ -6,29 +6,33 @@
 canvas {
 	border: 2px solid black;
 	position: absolute;
-	left: 20%;
+	left: 10px;
 }
 </style>
 </head>
 <body>
+
+<form action="javascript: filter.redraw();" name="theForm">
+
+	<p>
+		<label>Filter Type</label>
+		<input type="radio" name="filtType" value="sinc" checked="checked" onclick="filter.redraw();""> Sinc
+		<input type="radio" name="filtType" value="movAv" onclick="filter.redraw();""> Moving Average 
+	</p>
+	<p>
+		<label>Filter Amount</label>
+		<input type = "text" id = "filtAmt" value = "0.1" />
+
+		<label>Sinc size</label>
+		<input type = "text" id = "sincSize" value = "64" />
+
+		<button type="submit" onclick="filter.redraw();">Draw Filter</button>
+	</p>
+</form>
 <p>
-
-<label>Filter Type</label>
-<input type="radio" name="filtType" value="sinc" checked="checked"> Sinc
-<input type="radio" name="filtType" value="movAv"> Moving Average
-
+<button type="input" onclick="filter.drawSinc();">Draw Sinc</button>
 </p>
-<p>
-
-<label>Filter Amount</label>
-<input type = "text" id = "filtAmt" value = "0.1" />
-
-<label>Sinc size</label>
-<input type = "text" id = "sincSize" value = "64" />
-
-<button type="button" onclick="Redraw();"">Redraw</button>
-</p>
-<canvas id = "c"></canvas>
+<canvas id = "c" ></canvas>
 <script src = "filter.js"></script>
 
 </body>
